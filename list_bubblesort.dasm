@@ -1,0 +1,97 @@
+:list_bubblesort
+;
+; file:
+;     list_bubblesort.dasm
+;
+; name:
+;     bubble sort algorithm v1.1
+;
+; author:
+;     evan sneath - http://github.com/evansneath
+;
+; description:
+;     a simple bubble sort algorithm. this algorithm is
+;     compatible with my defined list data type. the list
+;     functions can be found here:
+;     https://gist.github.com/2385969
+;
+; changelog:
+;     4/13/2012 - version 1.0 published
+;     4/14/2012 - program comments updated
+;     4/15/2012 - changed registers to current standard ABI (v1.1)
+;     4/19/2012 - changed file/function name to match list lib
+;
+; license:
+;     this software is licensed under the open software
+;     license version 3.0:
+;     http://www.opensource.org/licenses/OSL-3.0
+; 
+; arguments:
+;     A - address of list
+;
+; list format:
+;     With the argument of A being head of the list, the
+;     list should be formatted as follows.
+;     [A] - size of list (n)
+;     [A+1] - first element
+;     ...
+;     [A+(n+1)] - last element
+;
+; example list:
+;     set [0x4000], 4
+;     set [0x4001], 7
+;     set [0x4002], 5
+;     set [0x4003], 9
+;     set [0x4005], 1
+;
+; example function call:
+;     set A, 0x4000
+;     jsr bubblesort
+
+:init
+    set push, O          ; save current register state
+    set push, J
+    set push, I
+    set push, C
+    set push, B
+    set push, A
+
+:loop1
+    set B, 1             ; B - stores current list index
+    set C, A             ; C - stores current list memory value
+    add C, 1
+    set I, 0             ; I - determine if swapped or not on pass
+
+:loop2
+    ife B, [A]           ; for J < N...
+        set PC, break
+
+    ifg [C], [C+1]       ; if ([C] > [C+1])
+        jsr swap         ; { swap() }
+
+    add B, 1             ; B++
+    add C, 1             ; C++
+    set PC, loop2
+
+:break
+    ife I, 1             ; if swapped, loop again
+        set PC, loop1
+
+    set PC, cleanup      ; else, cleanup
+
+:swap                    ; swap(index1=[C], index2=[C+1])
+    set J, [C]           ; J = tmp <= list[index1]
+    set [C], [C+1]       ; list[index1] <= list[index2]
+    set [C+1], J         ; list[index2] <= tmp
+    set I, 1             ; set is swapped flag
+    set PC, pop          ; return
+
+:cleanup
+    set A, pop           ; restore registers to initial state
+    set B, pop
+    set C, pop
+    set I, pop
+    set J, pop
+    set O, pop
+
+    set PC, pop          ; return
