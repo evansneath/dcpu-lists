@@ -1,0 +1,34 @@
+dcpu16-lists
+
+author:
+    evan sneath (https://github.com/evansneath)
+
+license:
+    this software licensed under the open software license version 3.0
+    http://www.opensource.org/licenses/OSL-3.0
+
+description:
+    a simple list data structure for the dcpu-16 instruction set and compatible
+    functions.
+
+functions:
+    the following are all list functions contained in the repository
+
+    list_lib.dasm
+        list_create - creates a new list object
+        list_destroy - destroys an existing list object
+        list_clear - sets all elements of a list to zero
+        list_set - sets the given element of a list to a specific value
+        list_get - gets the given element value of a list
+        list_push - pushes a new element to the back of a list
+        list_pop - pops an element from the back of the list
+        list_count - returns the number of elements in the list
+        list_max - returns the maximum value contained in the list
+        list_min - returns the minimum value contained in the list
+        list_avg - returns the average of the values contained in the list
+        
+    list_bubblesort.dasm
+        list_bubblesort - sorts a given list using the bubblesort algorithm
+        
+    list_heapsort.dasm
+        list_heapsort - sorts a given list using the heapsort algorithm
