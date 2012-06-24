@@ -1,15 +1,12 @@
-; file:
-;     list_lib.dasm
-;
 ; name:
 ;     list library v1.1
 ;
 ; author:
-;     evan sneath - http://github.com/evansneath
+;     Evan Sneath - http://github.com/evansneath
 ;
 ; description:
-;     this library provides data abstraction for lists.
-;     at the moment, only unsigned values are supported
+;     This library provides data abstraction for lists.
+;     At the moment, only unsigned values are supported
 ;     for functions such as max, min, and avg
 ;
 ; changelog:
@@ -18,7 +15,7 @@
 ;     4/16/2012 - v1.1 changed registers to current standard ABI
 ;
 ; license:
-;     this software is licensed under the open software
+;     This software is licensed under the open software
 ;     license version 3.0:
 ;     http://www.opensource.org/licenses/OSL-3.0
 ;
@@ -48,86 +45,87 @@
 ;     [A+(N-1)] - last element 
 ;
 ; example function call:
-;     SET A, 0x2000
-;     SET B, 4
-;     JSR list_create
+;     set A, 0x2000
+;     set B, 4
+;     jsr list_create
 ;
 ; caution:
-;     1. these functions have no awareness of your memory data.
-;     they will overwrite any data they encounter during
-;     list_create, list_add, list_push.
+;     1. These functions have no awareness of your memory data.
+;        They will overwrite any data they encounter during
+;        list_create, list_add, list_push.
 ;
-;     2. for each function called, registers A, B, C will be
-;     cleared of any data they happen to contain
+;     2. For each function called, registers A, B, C will be
+;        cleared of any data they happen to contain
 ;
 
 
 :list_create
 ;
 ; description:
-;     creates a new list with B elements all set to 0
+;     Creates a new list with B elements all set to 0
 ;     at memory location A
 ;
 ; arguments:
 ;     A - starting address of new list
 ;     B - number of elements in list
 ;
-SET [A], B         ; populate the list count with B
-JSR list_clear
-SET A, 0
-SET B, 0
-SET C, 0
-SET PC, POP
+    set [A], B         ; populate the list count with B
+    jsr list_clear
+    set A, 0
+    set B, 0
+    set C, 0
+    set PC, POP
 
 
 :list_destroy
 ;
 ; description:
-;     deletes any indication of list data from a target list
+;     Deletes any indication of list data from a target list
 ;     with memory location A
 ;
 ; arguments:
 ;     A - starting address of list to delete
 ;
-JSR list_clear
-SET [A], 0
-SET A, 0
-SET B, 0
-SET C, 0
-SET PC, POP
+    jsr list_clear
+    set [A], 0
+    set A, 0
+    set B, 0
+    set C, 0
+    set PC, POP
 
 
 :list_clear
 ;
 ; description:
-;     clears the entire list (setting elements to 0)
+;     Clears the entire list (setting elements to 0)
 ;     for a list with memory location A
 ;
 ; arguments:
 ;     A - starting address of list
 ;
-SET B, 1           ; holds current index
-SET C, A           ; holds current memory address
+    set B, 1           ; holds current index
+    set C, A           ; holds current memory address
 
 :loop_list_clear   ; for (index <= list.N) { list[index] = 0 }
-IFG B, [A]
-SET PC, cleanup_list_clear
-SET [C+1], 0
-ADD B, 1
-ADD C, 1
-SET PC, loop_list_clear
+    ifg B, [A]
+        set PC, cleanup_list_clear
+
+    set [C+1], 0
+    add B, 1
+    add C, 1
+    set PC, loop_list_clear
 
 :cleanup_list_clear
-SET A, 0
-SET B, 0
-SET C, 0
-SET PC, POP
+    set A, 0
+    set B, 0
+    set C, 0
+    set PC, POP
 
 
 :list_set
 ;
 ; description:
-;     given a list at memory location A, set its index B to C
+;     Given a list at memory location A, set its index B to C
 ;
 ; note:
 ;     index of list is from 0 to N-1
@@ -140,37 +138,38 @@ SET PC, POP
 ; returns:
 ;     A - success (0) or failure (1) based on index bounds
 ;
-SET PUSH, J        ; allocate 2 local vars on stack
-SET J, SP
-SUB SP, 3
-SET [J-1], A       ; [J-1] is new list addr
-SET [J-2], B       ; [J-2] is new index arg
-SET [J-3], C       ; [J-3] is new index value arg
+    set PUSH, J        ; allocate 2 local vars on stack
+    set J, SP
+    sub SP, 3
+    set [J-1], A       ; [J-1] is new list addr
+    set [J-2], B       ; [J-2] is new index arg
+    set [J-3], C       ; [J-3] is new index value arg
 
-JSR check_index    ; perform initial bounds checking
-IFE A, 1           ; if A is out of bounds, end program
-SET PC, cleanup_list_set
+    jsr check_index    ; perform initial bounds checking
+    
+    ife A, 1           ; if A is out of bounds, end program
+        set PC, cleanup_list_set
 
-SET B, [J-2]
-ADD B, 1
-ADD B, [J-1]
-SET [B], [J-3]     ; list[B] = C
+    set B, [J-2]
+    add B, 1
+    add B, [J-1]
+    set [B], [J-3]     ; list[B] = C
 
 :cleanup_list_set
-SET B, 0
-SET C, 0
-SET [J-1], 0
-SET [J-2], 0
-SET [J-3], 0
-SET SP, J
-SET J, POP
-SET PC, POP
+    set B, 0
+    set C, 0
+    set [J-1], 0
+    set [J-2], 0
+    set [J-3], 0
+    set SP, J
+    set J, POP
+    set PC, POP
 
 
 :list_get
 ;
 ; description:
-;     give a list at memory location A, get value of index B
+;     Give a list at memory location A, get value of index B
 ;
 ; note:
 ;     index of list is from 0 to N-1
@@ -183,57 +182,58 @@ SET PC, POP
 ;     A - success (0) or failure (1) based on index bounds
 ;     B - the value of the desired list index if A == 0
 ;
-SET PUSH, J
-SET J, SP
-SUB SP, 2
-SET [J-1], A       ; save args before check_index
-SET [J-2], B
+    set PUSH, J
+    set J, SP
+    sub SP, 2
+    set [J-1], A       ; save args before check_index
+    set [J-2], B
 
-JSR check_index    ; perform initial bounds checking
-IFE A, 1           ; if A is out of bounds, end program
-SET PC, cleanup_list_get
+    jsr check_index    ; perform initial bounds checking
+    
+    ife A, 1           ; if A is out of bounds, end program
+        set PC, cleanup_list_get
 
-SET C, [J-1]       ; restore args from stack
-SET B, [J-2]
+    set C, [J-1]       ; restore args from stack
+    set B, [J-2]
 
-ADD B, 1
-ADD B, C           ; calculate index mem addr
-SET B, [B]         ; set B to index value
+    add B, 1
+    add B, C           ; calculate index mem addr
+    set B, [B]         ; set B to index value
 
 :cleanup_list_get
-SET C, 0
-SET [J-1], 0
-SET [J-2], 0
-SET SP, J
-SET J, POP
-SET PC, POP
+    set C, 0
+    set [J-1], 0
+    set [J-2], 0
+    set SP, J
+    set J, POP
+    set PC, POP
 
 
 :list_push
 ;
 ; description:
-;     push a value B onto the end of the list starting at
+;     Push a value B onto the end of the list starting at
 ;     memory address A
 ;
 ; arguments:
 ;     A - starting address of list
 ;     B - new value to push to list
 ;
-ADD [A], 1         ; increment list count by 1
-SET C, A
-ADD C, [A]         ; set I to 
-SET [C], B
-SET A, 0
-SET B, 0
-SET C, 0
-SET PC, POP
+    add [A], 1         ; increment list count by 1
+    set C, A
+    add C, [A]         ; set I to 
+    set [C], B
+    set A, 0
+    set B, 0
+    set C, 0
+    set PC, POP
 
 
 :list_pop
 ;
 ; description:
-;     pop the last value from the list starting at memory
-;     address A. store the value in B
+;     Pop the last value from the list starting at memory
+;     address A. Store the value in B
 ;
 ; arguments:
 ;     A - starting address of list
@@ -241,20 +241,20 @@ SET PC, POP
 ; returns:
 ;     A - the value popped from the list
 ;
-SET B, A
-ADD B, [A]
-SUB [A], 1         ; list.N -= 1
-SET A, [B]         ; A = list[last]
-SET [B], 0         ; list[last] = 0
-SET B, 0
-SET C, 0
-SET PC, POP
+    set B, A
+    add B, [A]
+    sub [A], 1         ; list.N -= 1
+    set A, [B]         ; A = list[last]
+    set [B], 0         ; list[last] = 0
+    set B, 0
+    set C, 0
+    set PC, POP
 
 
 :list_count
 ;
 ; description:
-;     returns the number of elements in the list to A for a
+;     Returns the number of elements in the list to A for a
 ;     list starting at memory address A
 ;
 ; arguments:
@@ -263,16 +263,16 @@ SET PC, POP
 ; returns:
 ;     A - number of elements in the list
 ;
-SET A, [A]
-SET B, 0
-SET C, 0
-SET PC, POP
+    set A, [A]
+    set B, 0
+    set C, 0
+    set PC, POP
 
 
 :list_max
 ;
 ; description:
-;     returns the maximum value of the list into A for a list
+;     Returns the maximum value of the list into A for a list
 ;     starting at memory address A upon call
 ;
 ; arguments:
@@ -281,37 +281,39 @@ SET PC, POP
 ; returns:
 ;     A - maximum value found in the list
 ;
-SET PUSH, J
-SET J, SP
-SUB SP, 1
+    set PUSH, J
+    set J, SP
+    sub SP, 1
 
-SET B, 1           ; B is the loop iterator
-SET C, A           ; C holds address of list element
-SET [J-1], [A+1]   ; [J-1] holds the max value (first element)
+    set B, 1           ; B is the loop iterator
+    set C, A           ; C holds address of list element
+    set [J-1], [A+1]   ; [J-1] holds the max value (first element)
 
 :loop_list_max     ; for (B <= list.N) { check for max }
-IFG B, [A]
-SET PC, cleanup_list_max
-IFG [C+1], [J-1]
-SET [J-1], [C+1]   ; set [J-1] to new max value
-ADD B, 1           ; increment B, C
-ADD C, 1
-SET PC, loop_list_max
+    ifg B, [A]
+        set PC, cleanup_list_max
+
+    ifg [C+1], [J-1]
+        set [J-1], [C+1]   ; set [J-1] to new max value
+
+    add B, 1           ; increment B, C
+    add C, 1
+    set PC, loop_list_max
 
 :cleanup_list_max
-SET A, [J-1]       ; on end, set max value found to A
-SET B, 0           ; clear other used vars
-SET C, 0
-SET [J-1], 0       ; clean up stack
-SET SP, J
-SET J, POP
-SET PC, POP
+    set A, [J-1]       ; on end, set max value found to A
+    set B, 0           ; clear other used vars
+    set C, 0
+    set [J-1], 0       ; clean up stack
+    set SP, J
+    set J, POP
+    set PC, POP
 
 
 :list_min
 ;
 ; description:
-;     returns the minimum value of the list into A for a list
+;     Returns the minimum value of the list into A for a list
 ;     starting at memory address A upon call
 ;
 ; arguments:
@@ -320,37 +322,40 @@ SET PC, POP
 ; returns:
 ;     A - minimum value found in the list
 ;
-SET PUSH, J
-SET J, SP
-SUB SP, 1
+    set PUSH, J
+    set J, SP
+    sub SP, 1
 
-SET B, 1           ; B is the loop iterator
-SET C, A           ; C holds address of list element
-SET [J-1], [A+1]   ; [J-1] holds the min value (first element)
+    set B, 1           ; B is the loop iterator
+    set C, A           ; C holds address of list element
+    set [J-1], [A+1]   ; [J-1] holds the min value (first element)
+
 :loop_list_min     ; for (B <= list.N) { check for min }
-IFG B, [A]
-SET PC, cleanup_list_min
-IFG [J-1], [C+1]
-SET [J-1], [C+1]   ; set [J-1] to new min value
-ADD B, 1           ; increment B, C
-ADD C, 1
-SET PC, loop_list_min
+    ifg B, [A]
+        set PC, cleanup_list_min
+
+    ifg [J-1], [C+1]
+        set [J-1], [C+1]   ; set [J-1] to new min value
+
+    add B, 1           ; increment B, C
+    add C, 1
+    set PC, loop_list_min
 
 :cleanup_list_min
-SET A, [J-1]       ; on end, set min value found to A
-SET B, 0           ; clear other used vars
-SET C, 0
-SET [J-1], 0       ; clean up stack
-SET SP, J
-SET J, POP
-SET PC, POP
+    set A, [J-1]       ; on end, set min value found to A
+    set B, 0           ; clear other used vars
+    set C, 0
+    set [J-1], 0       ; clean up stack
+    set SP, J
+    set J, POP
+    set PC, POP
 
 
 :list_avg
 ;
 ; description:
-;     returns the average of all the list elements into A for
-;     a list starting at memory address A. note that the avg
+;     Returns the average of all the list elements into A for
+;     a list starting at memory address A. Note that the avg
 ;     value returned is truncated to floor(average)
 ;
 ; arguments:
@@ -359,39 +364,40 @@ SET PC, POP
 ; returns:
 ;     A - average value of the list elements
 ;
-SET PUSH, J
-SET J, SP
-SUB SP, 1
+    set PUSH, J
+    set J, SP
+    sub SP, 1
 
-SET B, 1           ; B is the loop iterator
-SET C, A           ; C holds address of list element
-SET [J-1], 0       ; [J-1] holds the average of the elements
+    set B, 1           ; B is the loop iterator
+    set C, A           ; C holds address of list element
+    set [J-1], 0       ; [J-1] holds the average of the elements
 
 :loop_list_avg     ; for (B <= list.N) { [J+1] += list[B] }
-IFG B, [A]
-SET PC, cleanup_list_avg
-ADD [J-1], [C+1]   ; add running total of all elements
-ADD B, 1           ; increment B, C
-ADD C, 1
-SET PC, loop_list_avg
+    ifg B, [A]
+        set PC, cleanup_list_avg
+
+    add [J-1], [C+1]   ; add running total of all elements
+    add B, 1           ; increment B, C
+    add C, 1
+    set PC, loop_list_avg
 
 :cleanup_list_avg
-SET B, [A]         ; have B hold list.N for now
-SET A, [J-1]       ; on end, set min value found to A
-DIV A, B           ; perform division to get average
-SET B, 0           ; clear other used vars
-SET C, 0
-SET [J-1], 0       ; clean up stack
-SET SP, J
-SET J, POP
-SET PC, POP
+    set B, [A]         ; have B hold list.N for now
+    set A, [J-1]       ; on end, set min value found to A
+    div A, B           ; perform division to get average
+    set B, 0           ; clear other used vars
+    set C, 0
+    set [J-1], 0       ; clean up stack
+    set SP, J
+    set J, POP
+    set PC, POP
 
 
 :check_index
 ;
 ; description:
-;     this is just a data verification to check whether the
-;     list index is index <= N-1. library users won't need
+;     This is just a data verification to check whether the
+;     list index is index <= N-1. Library users won't need
 ;     to call this
 ;
 ; arguments:
@@ -401,11 +407,13 @@ SET PC, POP
 ; returns:
 ;     A - returns success (0) or failure (1)
 ;
-SET C, [A]
-SUB C, 1           ; act as N-1 term
-SET A, 0
-IFG B, C           ; index > N-1 ? error : end
-SET A, 1
-SET B, 0
-SET C, 0
-SET PC, POP
+    set C, [A]
+    sub C, 1           ; act as N-1 term
+    set A, 0
+
+    ifg B, C           ; index > N-1 ? error : end
+        set A, 1
+
+    set B, 0
+    set C, 0
+    set PC, POP

@@ -1,16 +1,13 @@
 :list_bubblesort
 ;
-; file:
-;     list_bubblesort.dasm
-;
 ; name:
-;     bubble sort algorithm v1.1
+;     Bubble Sort Algorithm v1.1
 ;
 ; author:
-;     evan sneath - http://github.com/evansneath
+;     Evan Sneath - http://github.com/evansneath
 ;
 ; description:
-;     a simple bubble sort algorithm. this algorithm is
+;     A simple bubble sort algorithm. this algorithm is
 ;     compatible with my defined list data type. the list
 ;     functions can be found here:
 ;     https://gist.github.com/2385969
@@ -22,7 +19,7 @@
 ;     4/19/2012 - changed file/function name to match list lib
 ;
 ; license:
-;     this software is licensed under the open software
+;     This software is licensed under the open software
 ;     license version 3.0:
 ;     http://www.opensource.org/licenses/OSL-3.0
 ; 
@@ -30,7 +27,7 @@
 ;     A - address of list
 ;
 ; list format:
-;     With the argument of A being head of the list, the
+;     with the argument of A being head of the list, the
 ;     list should be formatted as follows.
 ;     [A] - size of list (n)
 ;     [A+1] - first element
@@ -49,12 +46,12 @@
 ;     jsr bubblesort
 
 :init
-    set push, O          ; save current register state
-    set push, J
-    set push, I
-    set push, C
-    set push, B
-    set push, A
+    set PUSH, O          ; save current register state
+    set PUSH, J
+    set PUSH, I
+    set PUSH, C
+    set PUSH, B
+    set PUSH, A
 
 :loop1
     set B, 1             ; B - stores current list index
@@ -84,14 +81,14 @@
     set [C], [C+1]       ; list[index1] <= list[index2]
     set [C+1], J         ; list[index2] <= tmp
     set I, 1             ; set is swapped flag
-    set PC, pop          ; return
+    set PC, POP          ; return
 
 :cleanup
-    set A, pop           ; restore registers to initial state
-    set B, pop
-    set C, pop
-    set I, pop
-    set J, pop
-    set O, pop
+    set A, POP           ; restore registers to initial state
+    set B, POP
+    set C, POP
+    set I, POP
+    set J, POP
+    set O, POP
 
-    set PC, pop          ; return
+    set PC, POP          ; return
